@@ -110,16 +110,19 @@ class Repo:
 class Builds:
     def __init__(self, lgr, c=None, auth_token=None, repo=None):
         # if config is given, use it, if not, use default
-        c = c if c else C
+        self.c = c if c else C
         # if authentication token is given, use it, if not request for one
-        auth_token = auth_token if auth_token else \
+        self.auth_token = auth_token if auth_token else \
             get_token(lgr, GITHUB_AUTH_URL, GITHUB_HANDSHAKE_URL, TOKEN)
         # define request url
         url = \
-            c['api_url'] + c['repos_uri'] + repo + '/' + c['builds_uri'][0:-1]
+            self.c['api_url'] + self.c['repos_uri'] + repo + '/' + \
+            self.c['builds_uri'][0:-1]
         # test for missing properties
         if not repo:
             raise RuntimeError('repo must be specified')
+
+        self.lgr = lgr
 
         # request data
         lgr.debug('Travis: requesting for build from: {}'.format(url))
@@ -136,6 +139,34 @@ class Builds:
         p = r.json()
         self.commits = p['commits']
         self.builds = p['builds']
+
+    def get_job_status(self, sha_id):
+        commit_id = self._get_commit_id(sha_id)
+        if commit_id is None:
+            raise RuntimeError('Could not find commit matching to sha {0}'
+                               .format(sha_id))
+
+        jobs_ids = self._get_job_ids(commit_id)
+        if jobs_ids is None:
+            raise RuntimeError('Could not retrieve job ids for sha {0}.'
+                               ' This should not happen'.format(sha_id))
+
+        jobs_state = dict()
+        for job_id in jobs_ids:
+            job = Job(self.lgr, self.c, self.auth_token, job_id)
+            jobs_state.update({job_id: job.state})
+
+        return jobs_state
+
+    def _get_commit_id(self, sha_id):
+        for commit in self.commits:
+            if commit['sha'] == sha_id:
+                return commit['id']
+
+    def _get_job_ids(self, commit_id):
+        for build in self.builds:
+            if build['commit_id'] == commit_id:
+                return build['job_ids']
 
 
 class Build:
