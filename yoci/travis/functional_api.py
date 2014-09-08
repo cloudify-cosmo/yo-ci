@@ -33,8 +33,8 @@ def _wait_for_commit(repo_name, sha_id, end):
 
         time.sleep(10)
 
-    lgr.warn('Failed waiting for commit with sha ID {0} on repo {1} for the'
-             ' duration of {2}ms'.format(sha_id, repo_name, time.time() - end))
+    lgr.warn('Failed waiting for commit with sha ID {0} on repo {1}'
+             .format(sha_id, repo_name))
 
 
 def _get_commit_id(repo_name, sha_id, end, branch_name=None):
@@ -77,7 +77,7 @@ def get_jobs_status(sha_id, repo_name, branch_name=None, timeout_min=15):
                     Default is set to 15 minutes.
     :return: a dictionary containing job results for the specified commit
     '''
-    end = end = time.time() + 60 * timeout_min
+    end = time.time() + 60 * timeout_min
 
     commit_id = _get_commit_id(repo_name, sha_id, end, branch_name=branch_name)
 
@@ -110,7 +110,3 @@ def get_jobs_status(sha_id, repo_name, branch_name=None, timeout_min=15):
 #                              branch_name='master',
 #                              timeout_min=15)
 
-jobs_state = get_jobs_status('7d86b25c3cf50b6ed6d754ef7917fc8764dc5f41',
-                                                        'cloudify-cosmo/cloudify-dsl-parser',
-                                                        branch_name='master',
-                                                        timeout_min=2)
