@@ -11,9 +11,9 @@ LOG_HEADERS = {
     'User-Agent': USER_AGENT
 }
 
-DEFAULT_CONFIG_PATH = '/home/adaml/.travis-config.yml'
+DEFAULT_CONFIG_PATH = '../config.yml'
 
-C = import_config(DEFAULT_CONFIG_PATH)['Travis']
+C = import_config(None)['Travis']
 
 
 def get_token(lgr, auth_url, hs_url, token):
