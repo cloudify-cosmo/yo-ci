@@ -1,6 +1,9 @@
 import requests
 import json
+import os
+
 from yoci.utils import import_config
+
 
 USER_AGENT = 'MyClient/1.0.0'
 ACCEPT = 'application/vnd.travis-ci.2+json'
@@ -11,9 +14,9 @@ LOG_HEADERS = {
     'User-Agent': USER_AGENT
 }
 
-DEFAULT_CONFIG_PATH = '../config.yml'
+DEFAULT_CONFIG_FILE_PATH = os.environ['DEFAULT_CONFIG_FILE_PATH']
 
-C = import_config(None)['Travis']
+C = import_config(DEFAULT_CONFIG_FILE_PATH)['Travis']
 
 
 def get_token(lgr, auth_url, hs_url, token):
