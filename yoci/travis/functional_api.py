@@ -109,4 +109,3 @@ def get_jobs_status(sha_id, repo_name, branch_name=None, timeout_min=15):
 #                              'cloudify-cosmo/packman',
 #                              branch_name='master',
 #                              timeout_min=15)
-
