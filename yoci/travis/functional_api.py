@@ -30,8 +30,8 @@ def _wait_for_commit(repo_name, sha_id, end):
         for commit in commits:
             if commit['sha'] == sha_id:
                 return commit
-            else:
-                time.sleep(10)
+
+        time.sleep(10)
 
     lgr.warn('Failed waiting for commit with sha ID {0} on repo {1} for the'
              ' duration of {2}ms'.format(sha_id, repo_name, time.time() - end))
@@ -105,3 +105,8 @@ def get_jobs_status(sha_id, repo_name, branch_name=None, timeout_min=15):
 #                              'cloudify-cosmo/packman',
 #                              branch_name='master',
 #                              timeout_min=15)
+
+jobs_state = get_jobs_status('7d86b25c3cf50b6ed6d754ef7917fc8764dc5f41',
+                                                        'cloudify-cosmo/cloudify-dsl-parser',
+                                                        branch_name='master',
+                                                        timeout_min=2)
