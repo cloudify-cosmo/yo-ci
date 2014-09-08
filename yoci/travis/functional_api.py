@@ -7,7 +7,7 @@ from yoci.travis.travis import Job
 lgr = logging.getLogger('travis_func_api')
 lgr.setLevel(logging.INFO)
 console_handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - '
+formatter = logging.Formatter('%(asctime)s-%(name)s[%(levelname)s] - '
                               '%(message)s')
 console_handler.setFormatter(formatter)
 lgr.addHandler(console_handler)
@@ -44,7 +44,7 @@ def _wait_for_commit(repo_name, sha_id, end):
                 lgr.info('Commit matching sha ID {0} was found'.format(sha_id))
                 return commit
 
-        lgr.info('Commit with sha ID \'{0}\' was found for repo {1}'
+        lgr.info('Commit with sha ID {0} was not found. Waiting for 10 seconds'
                  .format(sha_id, repo_name))
         time.sleep(10)
 
