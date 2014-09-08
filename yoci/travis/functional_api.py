@@ -39,6 +39,10 @@ def _wait_for_commit(repo_name, sha_id, end):
 
 def _get_commit_id(repo_name, sha_id, end, branch_name=None):
     commit = _wait_for_commit(repo_name, sha_id, end)
+    if not commit:
+        raise RuntimeError(
+            'Failed waiting for commit with sha ID {0} on repo {1} for the'
+            ' duration of {2}ms'.format(sha_id, repo_name, time.time() - end))
 
     # For validation reasons. branch not required with sha_id
     if branch_name and branch_name != commit['branch']:
