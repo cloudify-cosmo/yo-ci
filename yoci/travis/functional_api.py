@@ -33,14 +33,15 @@ def _wait_for_build_state(build_id, end):
              'state is {0}'.format(build['state']))
 
 
-def _wait_for_commit(repo_name, sha_id, end):
+def _wait_for_commit(repo_name, branch_name, sha_id, end):
     builds = Builds(lgr, repo=repo_name)
-    lgr.info('Waiting for commit with sha ID {0} and repo {1} for: {2} '
-             'seconds.'.format(sha_id, repo_name, int(end-time.time())))
+    lgr.info('Waiting for commit with sha ID {0} and repo {1} and branch {2}'
+             ' for: {3} seconds.'
+             .format(sha_id, repo_name, branch_name, int(end-time.time())))
     while time.time() < end:
         builds_list, commits = builds.list_builds()
         for commit in commits:
-            if commit['sha'] == sha_id:
+            if commit['sha'] == sha_id and commit['branch'] == branch_name:
                 lgr.info('Commit matching sha ID {0} was found'.format(sha_id))
                 return commit
 
@@ -48,26 +49,21 @@ def _wait_for_commit(repo_name, sha_id, end):
                  .format(sha_id, repo_name))
         time.sleep(10)
 
-    lgr.warning('Failed waiting for commit with sha ID {0} on repo {1}'
-                .format(sha_id, repo_name))
+    lgr.warning('Failed waiting for commit with sha ID {0} on repo {1} and '
+                'branch {2}'.format(sha_id, repo_name, branch_name))
 
 
 def _get_commit_id(repo_name, sha_id, end, branch_name=None):
-    commit = _wait_for_commit(repo_name, sha_id, end)
+    commit = _wait_for_commit(repo_name, branch_name, sha_id, end)
     if not commit:
         raise RuntimeError(
-            'Failed waiting for commit with sha ID {0} on repo {1}'
-            .format(sha_id, repo_name))
+            'Failed waiting for commit with sha ID {0} on repo {1} and branch '
+            '{2}'.format(sha_id, repo_name, branch_name))
 
-    # For validation reasons. branch not required with sha_id
-    if branch_name and branch_name != commit['branch']:
-        raise RuntimeError('Commit with sha_id {0} was made to branch'
-                           ' {1}. Expecting branch {2}'
-                           .format(sha_id, commit['branch'], branch_name))
     return commit['id']
 
 
-def _get_build_id(builds, commit_id):
+def _get_build_with_id(builds, commit_id):
     build_id = None
     for build in builds:
         if build['commit_id'] == commit_id:
@@ -85,8 +81,7 @@ def get_jobs_status(sha_id, repo_name, branch_name=None, timeout_min=15):
     :param repo_name:
                     The name of the repo the commit was made to.
     :param branch_name:
-                    The name of the branch the commit was made to
-                    Used mostly for validation.Ignored if not passed.
+                    The name of the branch the commit was made to.
     :param timout_min:
                     The timeout to wait for a build to reach final state.
                     Default is set to 15 minutes.
@@ -96,13 +91,9 @@ def get_jobs_status(sha_id, repo_name, branch_name=None, timeout_min=15):
 
     commit_id = _get_commit_id(repo_name, sha_id, end, branch_name=branch_name)
 
-    if commit_id is None:
-        raise RuntimeError('Could not find commit matching to sha {0} for repo'
-                           ' {1}'.format(sha_id, repo_name))
-
     builds = Builds(lgr, repo=repo_name)
     builds_list, commits = builds.list_builds()
-    build_id = _get_build_id(builds_list, commit_id)
+    build_id = _get_build_with_id(builds_list, commit_id)
 
     # We wait for the build to reach final state.
     build = _wait_for_build_state(build_id, end)
@@ -119,7 +110,6 @@ def get_jobs_status(sha_id, repo_name, branch_name=None, timeout_min=15):
         job = Job(lgr, job_id=job_id).show_job()
         jobs_state.update({job['config']['env']: job['state']})
     return jobs_state
-
 
 # jobs_state = get_jobs_status('40509789b11d1bf7cb4c785162cb77f9ea927274',
 #                              'cloudify-cosmo/packman',
