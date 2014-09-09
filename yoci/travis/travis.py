@@ -177,3 +177,29 @@ class Log:
         response = get(url, self.auth_token, self.lgr)
 
         return response.content
+
+
+class Branches:
+    @default_props
+    def __init__(self, lgr, c=None, auth_token=None, repo=None, branch=None):
+        self.c = c
+        self.auth_token = auth_token
+        self.lgr = lgr
+        self.repo = repo
+        self.branch = branch
+
+    def show_branch(self, repo, branch):
+        if not repo:
+            repo = self.repo
+            if not self.repo:
+                raise RuntimeError('repo ID must be specified')
+        if not branch:
+            branch = self.branch
+            if not self.branch:
+                raise RuntimeError('branch ID must be specified')
+
+        url = self.c['api_url'] + self.c['repos_uri'] + repo + '/' \
+            + self.c['branches_uri'] + branch
+        response = get(url, self.auth_token, self.lgr)
+
+        return response.json()['branch']

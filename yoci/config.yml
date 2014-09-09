@@ -6,7 +6,7 @@ Travis:
     accounts_uri: 'accounts/'
     jobs_uri: 'jobs/'
     logs_uri: 'logs/'
-    branches_uri: 'repos/{}/branches/'
+    branches_uri: 'branches/'
     # logs_uri: 'jobs/{job_id}/log.txt?deansi=true'
     auth_token: 865779f745b7475e3d9fd2de02c88bcca740eda4
     auth_github: auth/github
