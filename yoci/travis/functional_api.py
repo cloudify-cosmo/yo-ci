@@ -22,7 +22,8 @@ def _wait_for_build_state(build_id, end):
         state = build['state']
         if state != 'passed' and state != 'failed':
             lgr.info(
-                'Build state is: '+state+'. Waiting for build process to end')
+                'Build still in progress. Waiting for build process to end. '
+                'Current build state is: ' + state)
             time.sleep(10)
         else:
             lgr.info('Build matching ID {0} has reached a final state: {1}'
@@ -115,3 +116,7 @@ def get_jobs_status(sha_id, repo_name, branch_name=None, timeout_min=15):
 #                              'cloudify-cosmo/packman',
 #                              branch_name='master',
 #                              timeout_min=15)
+jobs_state = get_jobs_status('22553d7ea80c2a686626893dd7abdb7066cb34c7',
+                             'cloudify-cosmo/cloudify-chef-plugin',
+                             branch_name='1.1m4_build',
+                             timeout_min=2)
