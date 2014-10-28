@@ -111,12 +111,3 @@ def get_jobs_status(sha_id, repo_name, branch_name=None, timeout_min=15):
         job = Job(lgr, job_id=job_id).show_job()
         jobs_state.update({job['config']['env']: job['state']})
     return jobs_state
-
-# jobs_state = get_jobs_status('40509789b11d1bf7cb4c785162cb77f9ea927274',
-#                              'cloudify-cosmo/packman',
-#                              branch_name='master',
-#                              timeout_min=15)
-jobs_state = get_jobs_status('22553d7ea80c2a686626893dd7abdb7066cb34c7',
-                             'cloudify-cosmo/cloudify-chef-plugin',
-                             branch_name='1.1m4_build',
-                             timeout_min=2)
