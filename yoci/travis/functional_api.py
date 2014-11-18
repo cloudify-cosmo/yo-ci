@@ -20,7 +20,7 @@ def _wait_for_build_state(build_id, end):
     while time.time() < end:
         build = builds.show_build(id=build_id)
         state = build['state']
-        if state != 'passed' and state != 'failed':
+        if state != 'passed' and state != 'failed' and state != 'errored':
             lgr.info(
                 'Build still in progress. Waiting for build process to end. '
                 'Current build state is: ' + state)
