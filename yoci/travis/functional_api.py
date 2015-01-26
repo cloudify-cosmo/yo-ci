@@ -109,5 +109,8 @@ def get_jobs_status(sha_id, repo_name, branch_name=None, timeout_min=15):
     lgr.info('Getting jobs state for build with ID {0}'.format(build_id))
     for job_id in job_ids:
         job = Job(lgr, job_id=job_id).show_job()
-        jobs_state.update({job['config']['env']: job['state']})
+        if 'env' in job['config']:
+            jobs_state.update({job['config']['env']: job['state']})
+        else:
+            jobs_state.update({'state': job['state']})
     return jobs_state
