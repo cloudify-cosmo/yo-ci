@@ -99,6 +99,8 @@ def get_jobs_status(sha_id, repo_name, branch_name=None, timeout_min=15):
     # We wait for the build to reach final state.
     build = _wait_for_build_state(build_id, end)
     if build:
+        lgr.info('response for build with ID {0} is {1}'
+                 .format(build_id,build))
         job_ids = build['job_ids']
     else:
         raise RuntimeError('Failed waiting for build process to finish'
