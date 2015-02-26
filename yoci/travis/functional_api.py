@@ -13,6 +13,10 @@ console_handler.setFormatter(formatter)
 lgr.addHandler(console_handler)
 
 
+class TimeoutError(Exception):
+    pass
+
+
 def _wait_for_build_state(build_id, end):
     builds = Builds(lgr)
     lgr.info('Waiting for build with ID {0} to reach final state for {1} '
@@ -50,8 +54,10 @@ def _wait_for_commit(repo_name, branch_name, sha_id, end):
                  .format(sha_id, repo_name))
         time.sleep(10)
 
-    lgr.warning('Failed waiting for commit with sha ID {0} on repo {1} and '
-                'branch {2}'.format(sha_id, repo_name, branch_name))
+    err = 'Failed waiting for commit with sha ID {0} on repo {1} and ' \
+          'branch {2}'.format(sha_id, repo_name, branch_name)
+    lgr.warning(err)
+    raise TimeoutError(err)
 
 
 def _get_commit_id(repo_name, sha_id, end, branch_name=None):
